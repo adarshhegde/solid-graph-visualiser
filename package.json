@@ -2,11 +2,13 @@
   "name": "vite-template-solid",
   "version": "0.0.0",
   "description": "",
+  "homepage": "./",
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "build": "vite build",
-    "serve": "vite preview"
+    "build": "vite build --base=/solid-graph-visualiser/",
+    "serve": "vite preview",
+    "deploy": "gh-pages --dist 'dist' --branch 'release'"
   },
   "license": "MIT",
   "devDependencies": {
@@ -14,6 +16,7 @@
     "vite-plugin-solid": "^2.5.0"
   },
   "dependencies": {
+    "gh-pages": "^5.0.0",
     "solid-js": "^1.6.10"
   }
 }
