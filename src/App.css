@@ -16,16 +16,17 @@ header {
 
 .controls-group button, .controls-group select {
   padding: 0.4rem 1rem;
-  background: #342e6a;
+  background: #342e6a87;
   color: white;
-  
   border-radius: 2px;
   font-family: inherit;
   margin: 0 0.3rem;
+  border-color: #57438e;
+  border-width: 1px;
 }
 
 .controls-group button.selecting{
-  border-color:rgb(69, 252, 255);
+  border-color: rgb(244, 33, 122);
 }
 .graph-grid {
   --size: 90vh;

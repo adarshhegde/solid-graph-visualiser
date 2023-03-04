@@ -1,7 +1,7 @@
 import { createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import "./App.css";
-import {wait, getIndexFactory} from './utility';
+import { wait, getIndexFactory } from "./utility";
 // global state
 
 const [selectionMode, setSelectionMode] = createSignal(null);
@@ -15,7 +15,6 @@ const [algo_dropdown_selected, setAlgo_dropdown_selected] = createSignal(
 );
 const getIndex = getIndexFactory(graph_rows(), graph_cols());
 
-
 class Cell {
   constructor(i, j, type, oneDindex) {
     this.i = i;
@@ -24,7 +23,7 @@ class Cell {
     this.id = i + "" + j;
     this.type = createSignal(type);
     this.visited = createSignal(false);
-	this.highlight = createSignal(false);
+    this.highlight = createSignal(false);
     this.pathnode = createSignal(false);
     this.borders = createSignal([true, true, true, true]);
   }
@@ -41,13 +40,12 @@ class Cell {
   }
 
   getUnvisitedNeighbours() {
+    let top = getIndex(this.i - 1, this.j);
+    let right = getIndex(this.i, this.j + 1);
+    let bottom = getIndex(this.i + 1, this.j);
+    let left = getIndex(this.i, this.j - 1);
 
-		let top = getIndex(this.i - 1, this.j);
-		let right = getIndex(this.i, this.j + 1);
-		let bottom = getIndex(this.i + 1, this.j);
-		let left = getIndex(this.i, this.j - 1);
-
-		return [top, right, bottom, left].filter(x=> x !== -1);
+    return [top, right, bottom, left].filter((x) => x !== -1);
   }
 }
 
@@ -88,8 +86,7 @@ function CellElement(props) {
         props.cell.type[0](),
         props.cell.visited[0]() === true ? "visited" : "",
         props.cell.pathnode[0]() === true ? "pathnode" : "",
-		props.cell.highlight[0]() === true ? "highlight" : "",
-
+        props.cell.highlight[0]() === true ? "highlight" : "",
       ].join(" ")}
     >
       {/* {props.cell.id} */}
@@ -129,30 +126,37 @@ function App() {
   }
 
   function handleStart() {
-    if (animating()) return console.log("already animation started");
 
+    if (animating()) return console.log("already animation started");
+    
     if (source_node() != null && dest_node() == null) {
       alert("Set Starting & Ending Nodes");
-    } else {
-      if (algo_dropdown_selected() === "breadth_first_search") {
-        start_bfs();
-      } else if (algo_dropdown_selected() === "depth_first_search") {
-        start_dfs();
-      }
+    }
+
+    else {
+       const selected = algo_dropdown_selected();
+
+        if (selected === "breadth_first_search") {
+          start_bfs();
+        } else if (selected === "depth_first_search") {
+          start_dfs();
+        } else if (selected === "dijikstra") {
+          start_dfs();
+        }
     }
   }
 
   function handleReset() {
-	if(animating()) {
-		setAnimating(false);
-	}
-	changes = [];
-	grid.map((cell) => cell.visited[1](false));
+    if (animating()) {
+      setAnimating(false);
+    }
+    changes = [];
+    grid.map((cell) => cell.visited[1](false));
     grid.map((cell) => cell.pathnode[1](false));
   }
 
   async function handleRandomize() {
-	setAnimating(true);
+    setAnimating(true);
 
     changes = [];
 
@@ -165,42 +169,33 @@ function App() {
 
     let visited = new Array(grid.length).fill(false);
 
-	const stack = [0];
+    const stack = [0];
 
+    grid[0].visited[1](true);
+    grid[0].highlight[1](true);
+    let old_current = 0;
 
-	// Iterative implementation
-
-
-	// 	Choose the initial cell, mark it as visited and push it to the stack
-	// 	While the stack is not empty
-	// 		Pop a cell from the stack and make it a current cell
-	// 		If the current cell has any neighbours which have not been visited
-	// 			Push the current cell to the stack
-	// 			Choose one of the unvisited neighbours
-	// 			Remove the wall between the current cell and the chosen cell
-	// 			Mark the chosen cell as visited and push it to the stack
-
-	grid[0].visited[1](true);
-	grid[0].highlight[1](true);
-	let old_current = 0;
-
-	while(stack.length > 0) {
-		let vert = stack.pop();
-		grid[old_current].highlight[1](false);
-		grid[vert].highlight[1](true);
-		old_current=vert;
-		let unvisited_neighbours = grid[vert].getNeighbours().filter(n => !visited[n]);
-		if(unvisited_neighbours.length > 0) {
-			stack.push(vert);
-			let random = unvisited_neighbours[Math.floor(Math.random() * unvisited_neighbours.length)];
-			console.log(random);
-			if(Math.sin(Math.random()) > 0.6) grid[random].type[1]('wall');
-			visited[random] = true;
-			stack.push(random);
-		}
-		await wait(10);
-	}
-	
+    while (stack.length > 0) {
+      let vert = stack.pop();
+      grid[old_current].highlight[1](false);
+      grid[vert].highlight[1](true);
+      old_current = vert;
+      let unvisited_neighbours = grid[vert]
+        .getNeighbours()
+        .filter((n) => !visited[n]);
+      if (unvisited_neighbours.length > 0) {
+        stack.push(vert);
+        let random =
+          unvisited_neighbours[
+            Math.floor(Math.random() * unvisited_neighbours.length)
+          ];
+        console.log(random);
+        if (Math.sin(Math.random()) > 0.6) grid[random].type[1]("wall");
+        visited[random] = true;
+        stack.push(random);
+      }
+      await wait(10);
+    }
 
     await animate(changes);
     setAnimating(false);
@@ -254,11 +249,11 @@ function App() {
   }
 
   async function animate(changes) {
-    const delta = 1 + (changes.length * 2 ) / grid.length;
+    const delta = 1 + (changes.length * 2) / grid.length;
     const delay_calc = 50 / delta;
-	console.log(delta);
+    console.log(delta);
     for (let change of changes) {
-		if(!animating()) return;
+      if (!animating()) return;
       grid[change.vert][change.property][1](change.value);
       await wait(delay_calc);
     }
@@ -290,20 +285,20 @@ function App() {
 
     let stack = [source_node()];
 
-	let old_current = stack[0];
-	changes.push({ vert:old_current, property: "highlight", value: true });
+    let old_current = stack[0];
+    // changes.push({ vert: old_current, property: "highlight", value: true });
 
     while (stack.length > 0) {
       let vert = stack.pop();
-	  
-	  changes.push({ vert:old_current, property: "highlight", value: false });
+
+      // changes.push({ vert: old_current, property: "highlight", value: false });
 
       if (vert === dest_node()) {
-		  showPath(previous);
-		  break;
-		}
-	changes.push({ vert, property: "highlight", value: true });
-	old_current = vert;
+        showPath(previous);
+        break;
+      }
+      // changes.push({ vert, property: "highlight", value: true });
+      old_current = vert;
 
       if (!visited.includes(vert)) {
         // grid[vert].visited[1](true);
@@ -359,13 +354,12 @@ function App() {
           >
             <option value="breadth_first_search">Breadth First Search</option>
             <option value="depth_first_search">Depth First Search</option>
-            <option value="dijikstra">Dijikstra</option>
+            {/* <option value="dijikstra">Dijikstra</option> */}
           </select>
-		  <button onClick={handleRandomize}>randomize</button>
+          {/* <button onClick={handleRandomize}>randomize</button> */}
 
           <button onClick={handleStart}>start</button>
-		  <button onClick={handleReset}>reset</button>
-
+          <button onClick={handleReset}>reset</button>
         </div>
       </header>
 
