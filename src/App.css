@@ -1,0 +1,111 @@
+body {
+  background: rgb(19, 19, 19);
+  font-family: arial;
+}
+
+header {
+  display: flex;
+  margin: 1rem;
+  justify-content: center;
+}
+
+.controls-group {
+  display: flex;
+}
+
+
+.controls-group button, .controls-group select {
+  padding: 0.4rem 1rem;
+  background: #342e6a;
+  color: white;
+  
+  border-radius: 2px;
+  font-family: inherit;
+  margin: 0 0.3rem;
+}
+
+.controls-group button.selecting{
+  border-color:rgb(69, 252, 255);
+}
+.graph-grid {
+  --size: 90vh;
+  background: #0000;
+  height: var(--size);
+  width: var(--size);
+  display: grid;
+  grid-template-columns: repeat(var(--rows), 1fr);
+  margin:auto;
+  filter: drop-shadow(0 0 10px rgb(38, 3, 3));
+}
+
+.graph-grid .cell {
+  
+  transition: 0.2s all cubic-bezier(0.4, 0.0, 0.2, 1);;
+  color: transparent;
+  will-change: background;
+  position: relative;
+  background: none;
+  outline:0.01px solid #0000003d;
+}
+
+.graph-grid .cell.wall {
+  background: #2f2020;
+}
+
+@keyframes animate-to {
+  0% {
+    background: 0%;
+  }
+
+  100%{
+    background: var(--animate-to);
+    transform: scale(1.01);
+  }
+}
+
+.graph-grid .cell.visited {
+   background:transparent;
+  color:transparent; 
+  --animate-to: rgb(56, 56, 70);
+}
+
+.graph-grid .cell.pathnode {
+   background:transparent;
+  color:transparent; 
+  --animate-to: rgb(3, 109, 172);
+   box-shadow: 0 0 10px #7c68b380;
+}
+
+.graph-grid .cell.visited::before,.graph-grid .cell.pathnode::before {
+  content:'';
+  position: absolute;
+  inset:0;
+  transform: scale(0);
+  animation:0.3s animate-to forwards cubic-bezier(0.4, 0.0, 0.2, 1);;
+  z-index: -1;
+
+}
+
+
+.graph-grid .cell.source {
+  background: rgb(64, 172, 142);
+  color:transparent;
+    
+
+}
+
+.graph-grid .cell.dest {
+  background: rgb(85, 240, 197);
+  color:transparent;
+    
+
+}
+
+
+.graph-grid .cell.highlight {
+  background: rgb(0, 81, 255);
+  color:transparent;
+    
+
+}
+
